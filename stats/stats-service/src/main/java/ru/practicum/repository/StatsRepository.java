@@ -17,7 +17,7 @@ public interface StatsRepository extends JpaRepository<Stat, Long> {
             where s.timestamp > :start
             and s.timestamp < :end
             and s.uri in :uris
-            group by uri
+            group by uri, app
             """;
 
     @Query(value = SELECT_LIST_OF_STAT_DTO_RESPONSE_BETWEEN_START_AND_END_BY_URIS)

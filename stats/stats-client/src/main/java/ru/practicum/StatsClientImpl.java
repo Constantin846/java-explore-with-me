@@ -1,19 +1,90 @@
 package ru.practicum;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import ru.practicum.ewm.stats.dto.StatDto;
 import ru.practicum.ewm.stats.dto.StatDtoRequest;
 import ru.practicum.ewm.stats.dto.StatDtoResponse;
+import ru.practicum.exceptions.JsonSerializeException;
+import ru.practicum.exceptions.StatsServiceException;
 
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
+@Slf4j
 public class StatsClientImpl implements StatsClient {
+    private final RestClient restClient;
+    @Autowired
+    private final ObjectMapper objectMapper;
+
+    public StatsClientImpl(String uriBase) {
+        this.objectMapper = new ObjectMapper();
+        restClient = RestClient.builder()
+                .baseUrl(uriBase)
+                .build();
+    }
+
     @Override
     public StatDto create(StatDto statDto) {
-        return null; //todo
+        String result = null;
+        try {
+            result = restClient.post()
+                    .uri("/hit")
+                    .contentType(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON)
+                    .body(objectMapper.writeValueAsString(statDto))
+                    .retrieve()
+                    .body(String.class);
+
+        } catch (JsonProcessingException e) {
+            String message = String.format("Exception during serialize StatDto to json: %s", statDto);
+            log.warn(message);
+            throw new JsonSerializeException(message);
+
+        } catch (RestClientResponseException e) {
+            String responseMessage = e.getMessage().replace("\"", "");
+            String message = String.format("Exception during create stat: %s", responseMessage);
+            log.warn(message);
+            throw new StatsServiceException(e.getStatusCode().value(), message);
+        }
+
+        try {
+            return objectMapper.readValue(result, StatDto.class);
+
+        } catch (JsonProcessingException e) {
+            String message = String.format("Exception during deserialize json string to StatDto: %s", result);
+            log.warn(message);
+            throw new JsonSerializeException(message);
+        }
     }
 
     @Override
     public List<StatDtoResponse> findStats(StatDtoRequest statDtoRequest) {
-        return null; //todo
+        try {
+            return restClient.method(HttpMethod.GET)
+                    .uri("/stats")
+                    .contentType(APPLICATION_JSON)
+                    .body(objectMapper.writeValueAsString(statDtoRequest))
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<StatDtoResponse>>() {});
+
+        } catch (JsonProcessingException e) {
+            String message = String.format("Exception during serialize StatDtoResponse to json: %s", statDtoRequest);
+            log.warn(message);
+            throw new JsonSerializeException(message);
+
+        } catch (RestClientResponseException e) {
+            String responseMessage = e.getMessage().replace("\"", "");
+            String message = String.format("Exception during search stats: %s", responseMessage);
+            log.warn(message);
+            throw new StatsServiceException(e.getStatusCode().value(), message);
+        }
     }
 }
