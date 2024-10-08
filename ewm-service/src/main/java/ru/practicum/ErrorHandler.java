@@ -37,7 +37,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handlerRuntimeException(final RuntimeException e) {
         return Map.of(ERROR, e.getMessage());
     }

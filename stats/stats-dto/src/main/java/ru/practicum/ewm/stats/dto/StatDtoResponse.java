@@ -19,5 +19,5 @@ public class StatDtoResponse {
     @NotBlank
     String uri;
 
-    Long hit;
+    Long hits;
 }

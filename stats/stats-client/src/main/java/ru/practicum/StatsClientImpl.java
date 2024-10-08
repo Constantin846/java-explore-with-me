@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import ru.practicum.ewm.stats.dto.StatDto;
-import ru.practicum.ewm.stats.dto.StatDtoRequest;
 import ru.practicum.ewm.stats.dto.StatDtoResponse;
+import ru.practicum.ewm.stats.dto.StatsRequestContext;
 import ru.practicum.exceptions.JsonSerializeException;
 import ru.practicum.exceptions.StatsServiceException;
 
@@ -66,19 +65,18 @@ public class StatsClientImpl implements StatsClient {
     }
 
     @Override
-    public List<StatDtoResponse> findStats(StatDtoRequest statDtoRequest) {
+    public List<StatDtoResponse> findStats(StatsRequestContext statsRequestContext) {
         try {
-            return restClient.method(HttpMethod.GET)
-                    .uri("/stats")
-                    .contentType(APPLICATION_JSON)
-                    .body(objectMapper.writeValueAsString(statDtoRequest))
+            return restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/stats")
+                            .queryParam("start", statsRequestContext.getStart())
+                            .queryParam("end", statsRequestContext.getEnd())
+                            .queryParam("uris", statsRequestContext.getUris())
+                            .queryParam("unique", statsRequestContext.isUnique())
+                            .build())
                     .retrieve()
                     .body(new ParameterizedTypeReference<List<StatDtoResponse>>() {});
-
-        } catch (JsonProcessingException e) {
-            String message = String.format("Exception during serialize StatDtoResponse to json: %s", statDtoRequest);
-            log.warn(message);
-            throw new JsonSerializeException(message);
 
         } catch (RestClientResponseException e) {
             String responseMessage = e.getMessage().replace("\"", "");

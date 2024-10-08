@@ -1,8 +1,10 @@
 package ru.practicum.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.ewm.stats.dto.StatDto;
 import ru.practicum.ewm.stats.dto.StatDtoRequest;
 import ru.practicum.ewm.stats.dto.StatDtoResponse;
@@ -17,7 +19,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StatsServiceImpl implements StatsService{
+@Validated
+public class StatsServiceImpl implements StatsService {
     private final StatDtoMapper mapper;
     private final StatsRepository statsRepository;
 
@@ -29,18 +32,31 @@ public class StatsServiceImpl implements StatsService{
     }
 
     @Override
-    public List<StatDtoResponse> findStats(StatDtoRequest statDtoRequest) {
-        if (statDtoRequest.isUnique()) {
-            return statsRepository.findBetweenStartAndEndWithUniqueIpByUris(
-                    statDtoRequest.getStart(),
-                    statDtoRequest.getEnd(),
-                    statDtoRequest.getUris());
+    public List<StatDtoResponse> findStats(@Valid StatDtoRequest statDtoRequest) {
+        if (statDtoRequest.getUris() == null || statDtoRequest.getUris().isEmpty()) {
+            if (statDtoRequest.isUnique()) {
+                return statsRepository.findBetweenStartAndEndWithUniqueIp(
+                        statDtoRequest.getStart(),
+                        statDtoRequest.getEnd());
 
+            } else {
+                return statsRepository.findBetweenStartAndEnd(
+                        statDtoRequest.getStart(),
+                        statDtoRequest.getEnd());
+            }
         } else {
-            return statsRepository.findBetweenStartAndEndByUris(
-                    statDtoRequest.getStart(),
-                    statDtoRequest.getEnd(),
-                    statDtoRequest.getUris());
+            if (statDtoRequest.isUnique()) {
+                return statsRepository.findBetweenStartAndEndWithUniqueIpByUris(
+                        statDtoRequest.getStart(),
+                        statDtoRequest.getEnd(),
+                        statDtoRequest.getUris());
+
+            } else {
+                return statsRepository.findBetweenStartAndEndByUris(
+                        statDtoRequest.getStart(),
+                        statDtoRequest.getEnd(),
+                        statDtoRequest.getUris());
+            }
         }
     }
 

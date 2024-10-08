@@ -1,5 +1,6 @@
 package ru.practicum.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -29,6 +30,20 @@ public class ErrorHandler {
         String message = fieldError != null ? fieldError.getDefaultMessage() : INTERNAL_SERVER_ERROR;
         message = message != null ? message : INTERNAL_SERVER_ERROR;
         return Map.of(ERROR, message);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handlerConstraintViolationException(final ConstraintViolationException e) {
+        String message = e.getMessage().split(":")[1];
+        message = message != null ? message : INTERNAL_SERVER_ERROR;
+        return Map.of(ERROR, message);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handlerRuntimeException(final RuntimeException e) {
+        return Map.of(ERROR, e.getMessage());
     }
 
     @ExceptionHandler
