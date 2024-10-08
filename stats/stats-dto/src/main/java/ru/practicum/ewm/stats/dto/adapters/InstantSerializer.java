@@ -11,7 +11,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class InstantSerializer extends JsonSerializer<Instant>{
+public class InstantSerializer extends JsonSerializer<Instant> {
     @Value("${ewm-stats-dto.timestamp-pattern}")
     private String pattern;
     private final ZoneId zoneId = ZoneId.of("UTC+0");
