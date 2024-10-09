@@ -48,7 +48,7 @@ class StatsServiceImplTest {
     }
 
     @Test
-    void create_whenStatHasNotFound_thenReturnNotFoundException() {
+    void createWhenStatHasNotFoundThenReturnNotFoundException() {
         long id = 1L;
         Stat stat = new Stat();
         stat.setId(id);
@@ -62,7 +62,7 @@ class StatsServiceImplTest {
     }
 
     @Test
-    void findStats_whenUrisIsEmptyAndUniqueIsTrue_thenCallRepo_findBetweenStartAndEndWithUniqueIp() {
+    void findStatsWithUniqueIp() {
         StatDtoRequest statDtoRequest = new StatDtoRequest();
         statDtoRequest.setStart(Instant.now());
         statDtoRequest.setEnd(Instant.now());
@@ -75,7 +75,7 @@ class StatsServiceImplTest {
     }
 
     @Test
-    void findStats_whenUrisIsEmptyAndUniqueIsFalse_thenCallRepo_findBetweenStartAndEnd() {
+    void findStatsWithoutUniqueIp() {
         StatDtoRequest statDtoRequest = new StatDtoRequest();
         statDtoRequest.setStart(Instant.now());
         statDtoRequest.setEnd(Instant.now());
@@ -88,7 +88,7 @@ class StatsServiceImplTest {
     }
 
     @Test
-    void findStats_whenUrisIsNotEmptyAndUniqueIsTrue_thenCallRepo_findBetweenStartAndEndWithUniqueIpByUris() {
+    void findStatsWithUniqueIpByUris() {
         StatDtoRequest statDtoRequest = new StatDtoRequest();
         statDtoRequest.setStart(Instant.now());
         statDtoRequest.setEnd(Instant.now());
@@ -102,7 +102,7 @@ class StatsServiceImplTest {
     }
 
     @Test
-    void findStats_whenUrisIsNotEmptyAndUniqueIsFalse_thenCallRepo_findBetweenStartAndEndByUris() {
+    void findStatsWithoutUniqueIpByUris() {
         StatDtoRequest statDtoRequest = new StatDtoRequest();
         statDtoRequest.setStart(Instant.now());
         statDtoRequest.setEnd(Instant.now());

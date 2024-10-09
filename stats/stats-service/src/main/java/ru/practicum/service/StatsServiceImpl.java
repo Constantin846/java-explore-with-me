@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.ewm.stats.dto.StatDto;
 import ru.practicum.ewm.stats.dto.StatDtoRequest;
@@ -25,6 +26,7 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
 
     @Override
+    @Transactional
     public StatDto create(StatDto statDto) {
         Stat stat = mapper.toStat(statDto);
         stat = statsRepository.save(stat);
