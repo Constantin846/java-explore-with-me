@@ -17,7 +17,6 @@ public class StatsRequestContext {
     @NotBlank(message = "End period of needed stats must be set")
     String end;
 
-    //@NotEmpty(message = "Uris of needed stats must be set")
     List<String> uris;
 
     boolean unique = false;

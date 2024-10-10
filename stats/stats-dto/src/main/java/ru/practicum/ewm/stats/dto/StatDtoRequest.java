@@ -29,10 +29,8 @@ public class StatDtoRequest implements StartEndInstantAvailable {
     @NotNull(message = "End period of needed stats must be set")
     @JsonSerialize(using = InstantSerializer.class)
     @JsonDeserialize(using = InstantDeserializer.class)
-    //@PastOrPresent(message = "End time must not be in the future")
     Instant end;
 
-    //@NotEmpty(message = "Uris of needed stats must be set")
     List<String> uris;
 
     boolean unique = false;
