@@ -1,0 +1,20 @@
+server.port: 8080
+
+stats-service.url: http://localhost:9090
+ewm-stats-dto.timestamp-pattern: yyyy-MM-dd HH:mm:ss
+
+
+spring:
+  jpa:
+    hibernate.ddl-auto: none
+    properties.hibernate.format_sql: true
+    #show-sql: true
+  sql.init.mode: always
+  #config.activate.on-profile: ci,test
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:ewm-stats
+    username: ewm-stats
+    password: ewm-stats
+
+  h2.console.enabled: true

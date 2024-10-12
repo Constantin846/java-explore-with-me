@@ -1,0 +1,5 @@
+server.port: 9090
+
+ewm-stats-dto.timestamp-pattern: yyyy-MM-dd HH:mm:ss
+
+spring.profiles.active: dev
