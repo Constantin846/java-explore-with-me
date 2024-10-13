@@ -23,7 +23,7 @@ public class TestStatsController {
 
     @PostMapping("/hit")
     public StatDto create(@Valid @RequestBody StatDto statDto) {
-        log.info("Create stat: {}", statDto);
+        log.info("CreateValid stat: {}", statDto);
         return statsClient.create(statDto);
     }
 

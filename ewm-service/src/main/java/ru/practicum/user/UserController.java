@@ -1,6 +1,5 @@
 package ru.practicum.user;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.user.dto.FindUsersContext;
 import ru.practicum.user.dto.UserDto;
-import ru.practicum.user.service.UserServiceFacade;
+import ru.practicum.user.service.UserService;
 
 import java.util.List;
 
@@ -26,26 +25,26 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class UserController {
-    private final UserServiceFacade userService;
+    private final UserService userService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> findUsers(@Valid FindUsersContext context, HttpServletRequest request) {
+    public List<UserDto> findUsers(@Valid FindUsersContext context) {
         log.info("Find users {}:", context);
-        return userService.findUsers(context, request);
+        return userService.findUsers(context);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@Valid @RequestBody UserDto userDto, HttpServletRequest request) {
-        log.info("Create user {}:", userDto);
-        return userService.create(userDto, request);
+    public UserDto create(@Valid @RequestBody UserDto userDto) {
+        log.info("CreateValid user {}:", userDto);
+        return userService.create(userDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") long userId, HttpServletRequest request) {
+    public void delete(@PathVariable("id") long userId) {
         log.info("Delete user {}:", userId);
-        userService.delete(userId, request);
+        userService.delete(userId);
     }
 }

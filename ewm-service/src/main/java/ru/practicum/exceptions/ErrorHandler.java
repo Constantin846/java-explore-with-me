@@ -53,6 +53,17 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handlerConditionNotMetException(final ConditionNotMetException e) {
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.FORBIDDEN.toString());
+        apiError.setReason("For the requested operation the conditions are not met");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handlerRuntimeException(final RuntimeException e) {
         return Map.of(ERROR, e.getMessage()); //todo

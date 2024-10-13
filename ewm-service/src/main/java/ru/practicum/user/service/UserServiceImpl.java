@@ -2,7 +2,9 @@ package ru.practicum.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exceptions.NotFoundException;
 import ru.practicum.user.User;
 import ru.practicum.user.dto.FindUsersContext;
@@ -21,11 +23,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> findUsers(FindUsersContext context) {
-        List<User> users = repository.findByIdLimitOffset(context.getIds(), context.getSize(), context.getFrom());
+        List<User> users;
+        if (context.getIds() == null) {
+            users = repository.findAll(PageRequest.of(context.getFrom(), context.getSize())).stream().toList();
+        } else {
+            users = repository.findAllByIdIn(context.getIds(), PageRequest.of(context.getFrom(), context.getSize()));
+        }
         return mapper.toUserDto(users);
     }
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
         User user = mapper.toUser(userDto);
         user = repository.save(user);
@@ -33,6 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(long userId) {
         if (repository.existsById(userId)) {
             repository.deleteById(userId);

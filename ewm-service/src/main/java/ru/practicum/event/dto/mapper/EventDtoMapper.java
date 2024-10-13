@@ -49,4 +49,9 @@ public interface EventDtoMapper {
         category.setId(categoryId);
         return category;
     }
+
+    @Named("toCategoryId")
+    default long toCategoryId(Category category) {
+        return category.getId();
+    }
 }
