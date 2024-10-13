@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApiError {
 
-    //List<String> errors;
+    //List<String> errors; //todo
 
     String message;
 

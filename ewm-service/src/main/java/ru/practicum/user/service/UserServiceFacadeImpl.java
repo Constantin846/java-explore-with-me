@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class UserServiceFacadeImpl implements UserServiceFacade {
+public class UserServiceFacadeImpl implements UserServiceFacade { //todo delete
     private final UserService userService;
     private final StatsService statsService;
 
