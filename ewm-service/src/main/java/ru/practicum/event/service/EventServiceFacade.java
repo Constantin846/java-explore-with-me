@@ -1,9 +1,9 @@
 package ru.practicum.event.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import ru.practicum.PageParams;
 import ru.practicum.event.contexts.AdminFindEventsParams;
 import ru.practicum.event.contexts.FindEventsParams;
-import ru.practicum.event.contexts.PageParams;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;

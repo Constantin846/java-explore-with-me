@@ -1,4 +1,4 @@
-package ru.practicum.event.contexts;
+package ru.practicum;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;

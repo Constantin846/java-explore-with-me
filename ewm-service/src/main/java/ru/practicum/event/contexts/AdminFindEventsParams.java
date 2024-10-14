@@ -2,12 +2,12 @@ package ru.practicum.event.contexts;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.practicum.PageParams;
 
 import java.util.List;
 
 @Getter
 @Setter
-//@FieldDefaults(level = AccessLevel.PROTECTED)
 public class AdminFindEventsParams extends PageParams {
 
     private List<Long> users;

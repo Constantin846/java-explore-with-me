@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.PageParams;
 import ru.practicum.event.contexts.AdminFindEventsParams;
 import ru.practicum.event.contexts.FindEventsParams;
-import ru.practicum.event.contexts.PageParams;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
@@ -27,7 +27,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("")
+@RequestMapping
 @RequiredArgsConstructor
 @Validated
 public class EventController {

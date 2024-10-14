@@ -11,6 +11,8 @@ import ru.practicum.event.dto.Location;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.model.Event;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventDtoMapper {
     EventDtoMapper MAPPER = Mappers.getMapper(EventDtoMapper.class);
@@ -24,6 +26,10 @@ public interface EventDtoMapper {
     EventFullDto toEventFullDto(Event event);
 
     EventShortDto toEventShortDto(Event event);
+
+    List<EventFullDto> toEventFullDto(List<Event> events);
+
+    List<EventShortDto> toEventShortDto(List<Event> events);
 
     @Named("toLocation")
     default Location toLocation(Event event) {
