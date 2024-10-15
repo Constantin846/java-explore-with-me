@@ -27,7 +27,8 @@ public class CategoryController {
     private final CategoryService categoryService;
     private static final String ADMIN = "/admin";
     private static final String CATEGORIES = "/categories";
-    private static final String CATEGORY_ID = "/{category-id}";
+    private static final String CATEGORY_ID = "category-id";
+    private static final String CATEGORY_ID_PATH = "/{category-id}";
 
     @PostMapping(ADMIN + CATEGORIES)
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,7 +37,7 @@ public class CategoryController {
         return categoryService.create(categoryDto);
     }
 
-    @PatchMapping(ADMIN + CATEGORIES + CATEGORY_ID)
+    @PatchMapping(ADMIN + CATEGORIES + CATEGORY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto update(@Valid @RequestBody CategoryDto categoryDto,
                               @PathVariable(CATEGORY_ID) long catId) {
@@ -44,7 +45,7 @@ public class CategoryController {
         return categoryService.update(categoryDto, catId);
     }
 
-    @DeleteMapping(ADMIN + CATEGORIES + CATEGORY_ID)
+    @DeleteMapping(ADMIN + CATEGORIES + CATEGORY_ID_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(CATEGORY_ID) long catId) {
         log.info("Request: delete category by id: {}", catId);
@@ -58,7 +59,7 @@ public class CategoryController {
         return categoryService.findAll(params);
     }
 
-    @GetMapping(CATEGORIES + CATEGORY_ID)
+    @GetMapping(CATEGORIES + CATEGORY_ID_PATH)
     @ResponseStatus(HttpStatus.OK)
     public CategoryDto findById(@PathVariable(CATEGORY_ID) long catId) {
         log.info("Request: find category by id: {}", catId);

@@ -34,32 +34,34 @@ public class EventController {
     private final EventServiceFacade eventServiceFacade;
     private static final String ADMIN = "/admin";
     private static final String EVENTS = "/events";
-    private static final String EVENT_ID = "/{event-id}";
+    private static final String EVENT_ID = "event-id";
+    private static final String EVENT_ID_PATH = "/{event-id}";
     private static final String USERS = "/users";
-    private static final String USER_ID = "/{user-id}";
+    private static final String USER_ID = "user-id";
+    private static final String USER_ID_PATH = "/{user-id}";
 
-    @GetMapping(USERS + USER_ID + EVENTS)
+    @GetMapping(USERS + USER_ID_PATH + EVENTS)
     public List<EventShortDto> findAllByUserId(@PathVariable(USER_ID) long userId,
                                             @Valid PageParams params) {
         log.info("Request: find all by user id={} with params={}", userId, params);
         return eventServiceFacade.findAllByUserId(userId, params);
     }
 
-    @PostMapping(USERS + USER_ID + EVENTS)
+    @PostMapping(USERS + USER_ID_PATH + EVENTS)
     public EventFullDto create(@PathVariable(USER_ID) long userId,
                                 @Validated({CreateValid.class})  @RequestBody NewEventDto eventDto) {
         log.info("Request: create event: {}", eventDto);
         return eventServiceFacade.create(eventDto, userId);
     }
 
-    @GetMapping(USERS + USER_ID + EVENTS + EVENT_ID)
+    @GetMapping(USERS + USER_ID_PATH + EVENTS + EVENT_ID_PATH)
     public EventFullDto findByEventIdUserId(@PathVariable(USER_ID) long userId,
                                             @PathVariable(EVENT_ID) long eventId) {
         log.info("Request: find by event id={} with user id={}", eventId, userId);
         return eventServiceFacade.findByEventIdUserId(eventId, userId);
     }
 
-    @PatchMapping(USERS + USER_ID + EVENTS + EVENT_ID)
+    @PatchMapping(USERS + USER_ID_PATH + EVENTS + EVENT_ID_PATH)
     public EventFullDto updateByEventIdUserId(
             @PathVariable(USER_ID) long userId,
             @PathVariable(EVENT_ID) long eventId,
@@ -74,7 +76,7 @@ public class EventController {
         return eventServiceFacade.findAllForAdmin(params);
     }
 
-    @PatchMapping(ADMIN+ EVENTS + EVENT_ID)
+    @PatchMapping(ADMIN+ EVENTS + EVENT_ID_PATH)
     public EventFullDto updateByEventIdAdmin(
             @PathVariable(EVENT_ID) long eventId,
             @RequestBody UpdateEventRequest eventDto) {
@@ -88,7 +90,7 @@ public class EventController {
         return eventServiceFacade.findAll(params, request);
     }
 
-    @GetMapping(EVENTS + EVENT_ID)
+    @GetMapping(EVENTS + EVENT_ID_PATH)
     public EventFullDto findByEventId(@PathVariable(EVENT_ID) long eventId, HttpServletRequest request) {
         log.info("Request: find by event id={}", eventId);
         return eventServiceFacade.findByEventId(eventId, request);

@@ -27,9 +27,17 @@ public interface EventDtoMapper {
 
     EventShortDto toEventShortDto(Event event);
 
-    List<EventFullDto> toEventFullDto(List<Event> events);
+    default List<EventFullDto> toEventFullDto(List<Event> events) {
+        return events.stream()
+                .map(this::toEventFullDto)
+                .toList();
+    }
 
-    List<EventShortDto> toEventShortDto(List<Event> events);
+    default List<EventShortDto> toEventShortDto(List<Event> events) {
+        return events.stream()
+                .map(this::toEventShortDto)
+                .toList();
+    }
 
     @Named("toLocation")
     default Location toLocation(Event event) {

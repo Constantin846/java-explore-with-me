@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.event.model.State;
 import ru.practicum.ewm.stats.dto.adapters.InstantSerializer;
 
 import java.time.Instant;
@@ -27,6 +28,8 @@ public class EventFullDto extends EventShortDto {
     Instant publishedOn;
 
     Boolean requestModeration;
+
+    State state;
 
     String title;
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.PageParams;
 import ru.practicum.category.Category;
 import ru.practicum.category.CategoryRepository;
@@ -22,11 +23,13 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryDtoMapper mapper;
 
     @Override
+    @Transactional
     public CategoryDto create(CategoryDto categoryDto) {
         return save(categoryDto);
     }
 
     @Override
+    @Transactional
     public CategoryDto update(CategoryDto categoryDto, long catId) {
         if (checkCategoryExists(catId)) {
             return save(categoryDto);
@@ -35,6 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void delete(long catId) {
         if (checkCategoryExists(catId)) {
             categoryRepository.deleteById(catId); //todo

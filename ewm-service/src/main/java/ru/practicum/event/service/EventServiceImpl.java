@@ -45,7 +45,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> findAllByUserId(long userId, PageParams params) {
-        List<Event> events = eventRepository.findAllByUserId(
+        List<Event> events = eventRepository.findAllByInitiator(
                 userId, PageRequest.of(params.getFrom(), params.getSize()));
         return mapper.toEventShortDto(events);
     }
@@ -205,7 +205,7 @@ public class EventServiceImpl implements EventService {
         }
         Specification<Event> allSpecifications = specifications.stream().reduce(Specification::and).get();
 
-        Sort sort;
+        Sort sort = null;
         switch (SortEnum.valueOf(params.getSort())) {
             case EVENT_DATE -> sort = Sort.by(Sort.Direction.ASC, "event_date");
 
@@ -214,8 +214,8 @@ public class EventServiceImpl implements EventService {
             default -> sort = Sort.unsorted();
         }
 
-        List<Event> events = eventRepository.findAllBySort(
-                allSpecifications, sort, PageRequest.of(params.getFrom(), params.getSize()));
+        List<Event> events = eventRepository.findAllBy(
+                allSpecifications, PageRequest.of(params.getFrom(), params.getSize(), sort));
         eventRepository.incrementViewsEvents(events.stream().map(Event::getId).toList());
         return mapper.toEventShortDto(events);
     }
