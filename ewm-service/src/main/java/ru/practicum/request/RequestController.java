@@ -56,7 +56,7 @@ public class RequestController {
 
     @GetMapping(USERS + USER_ID_PATH + EVENTS + EVENT_ID_PATH + REQUESTS)
     public List<RequestDto> findForUserByEventId(@PathVariable(USER_ID) long userId,
-                                                @PathVariable(EVENT_ID) long eventId) {
+                                                 @PathVariable(EVENT_ID) long eventId) {
         log.info("Request: find requests for user id:{} and event id:{}", userId, eventId);
         return requestService.findForUserByEventId(userId, eventId);
     }
