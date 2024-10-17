@@ -8,6 +8,7 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exceptions.ConditionNotMetException;
+import ru.practicum.exceptions.ConflictException;
 import ru.practicum.exceptions.NotAccessException;
 import ru.practicum.exceptions.NotFoundException;
 import ru.practicum.request.RequestRepository;
@@ -20,6 +21,7 @@ import ru.practicum.request.model.Status;
 import ru.practicum.user.repository.UserRepository;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,17 +54,18 @@ public class RequestServiceImpl implements RequestService {
             if (event.getInitiator().getId() == userId) {
                 String message = String.format("Forbidden participate in your event: %s", userId);
                 log.warn(message);
-                throw new NotAccessException(message);
+                throw new ConflictException(message);
             }
             if (event.getState() != State.PUBLISHED) {
                 String message = String.format("Forbidden participate in unpublished event: %s", event);
                 log.warn(message);
-                throw new NotAccessException(message);
+                throw new ConflictException(message);
             }
-            if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
+            if (event.getConfirmedRequests() == event.getParticipantLimit()
+                    && event.getParticipantLimit() != UNLIMITED_PARTICIPANT) {
                 String message = String.format("Forbidden: events participation request limit reached: %s", event);
                 log.warn(message);
-                throw new NotAccessException(message);
+                throw new ConflictException(message);
             }
 
             Request request = new Request();
@@ -70,8 +73,12 @@ public class RequestServiceImpl implements RequestService {
             request.setEvent(event.getId());
             request.setRequester(userId);
             request.setStatus(Status.PENDING);
-
             request = requestRepository.save(request);
+
+            int confirmedRequests = event.getConfirmedRequests();
+            event.setConfirmedRequests(++confirmedRequests);
+            eventRepository.save(event);
+
             return mapper.toRequestDto(getRequestById(request.getId()));
         }
         return null;
@@ -88,7 +95,7 @@ public class RequestServiceImpl implements RequestService {
                 log.warn(message);
                 throw new NotAccessException(message);
             }
-            request.setStatus(Status.REJECTED);
+            request.setStatus(Status.CANCELED);
             request = requestRepository.save(request);
             return mapper.toRequestDto(getRequestById(request.getId()));
         }
@@ -107,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
         return null;
     }
 
-    private final static int UNLIMITED_PARTICIPANT = 0;
+    private static final int UNLIMITED_PARTICIPANT = 0;
 
     @Override
     @Transactional
@@ -123,11 +130,11 @@ public class RequestServiceImpl implements RequestService {
                         log.warn(message);
                         throw new ConditionNotMetException(message);
                     }
-                    if (requests.stream().anyMatch(request -> request.getStatus() != Status.PENDING)) {
+                    /*if (requests.stream().anyMatch(request -> request.getStatus() != Status.PENDING)) {
                         String message = "Only request with status pending is able confirmed";
                         log.warn(message);
                         throw new ConditionNotMetException(message);
-                    }
+                    }*/ //todo
 
                     if (event.getParticipantLimit() == UNLIMITED_PARTICIPANT) {
                         requests = requests.stream()
@@ -157,17 +164,22 @@ public class RequestServiceImpl implements RequestService {
                             }).toList();
                 }
                 requestRepository.saveAll(requests);
-
-                Map<Status, Set<Request>> requestsMap = requests.stream()
-                        .collect(Collectors.groupingBy((Request::getStatus), Collectors.toSet()));
-
-                RequestStatusResponse response = new RequestStatusResponse();
-                response.setConfirmedRequests(mapper.toRequestDto(requestsMap.get(Status.CONFIRMED)));
-                response.setConfirmedRequests(mapper.toRequestDto(requestsMap.get(Status.REJECTED)));
-                return response;
+                return toRequestStatusResponse(requests);
             }
         }
         return null;
+    }
+
+    private RequestStatusResponse toRequestStatusResponse(List<Request> requests) {
+        Map<Status, Set<Request>> requestsMap = requests.stream()
+                .collect(Collectors.groupingBy((Request::getStatus), Collectors.toSet()));
+
+        RequestStatusResponse response = new RequestStatusResponse();
+        response.setConfirmedRequests(mapper.toRequestDto(
+                requestsMap.getOrDefault(Status.CONFIRMED, new HashSet<>())));
+        response.setConfirmedRequests(mapper.toRequestDto(
+                requestsMap.getOrDefault(Status.REJECTED, new HashSet<>())));
+        return response;
     }
 
     private Request getRequestById(long requestId) {

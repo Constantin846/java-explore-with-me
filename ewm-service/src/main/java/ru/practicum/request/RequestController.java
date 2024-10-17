@@ -3,6 +3,7 @@ package ru.practicum.request;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.request.dto.RequestDto;
 import ru.practicum.request.dto.RequestStatusResponse;
@@ -35,12 +37,14 @@ public class RequestController {
     private static final String USER_ID_PATH = "/{user-id}";
 
     @GetMapping(USERS + USER_ID_PATH + REQUESTS)
+    @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> findByUserId(@PathVariable(USER_ID) long userId) {
         log.info("Request: find requests by user id: {}", userId);
         return requestService.findByUserId(userId);
     }
 
     @PostMapping(USERS + USER_ID_PATH + REQUESTS)
+    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto create(@PathVariable(USER_ID) long userId,
                              @RequestParam("eventId") long eventId) {
         log.info("Request: create request of user={} to take part in event: {}", userId, eventId);
@@ -48,6 +52,7 @@ public class RequestController {
     }
 
     @PatchMapping(USERS + USER_ID_PATH + REQUESTS + REQUEST_ID_PATH + "/cancel")
+    @ResponseStatus(HttpStatus.OK)
     public RequestDto cancel(@PathVariable(USER_ID) long userId,
                              @PathVariable(REQUEST_ID) long requestId) {
         log.info("Request: cancel request: {}", requestId);
@@ -55,6 +60,7 @@ public class RequestController {
     }
 
     @GetMapping(USERS + USER_ID_PATH + EVENTS + EVENT_ID_PATH + REQUESTS)
+    @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> findForUserByEventId(@PathVariable(USER_ID) long userId,
                                                  @PathVariable(EVENT_ID) long eventId) {
         log.info("Request: find requests for user id:{} and event id:{}", userId, eventId);
@@ -62,6 +68,7 @@ public class RequestController {
     }
 
     @PatchMapping(USERS + USER_ID_PATH + EVENTS + EVENT_ID_PATH + REQUESTS)
+    @ResponseStatus(HttpStatus.OK)
     public RequestStatusResponse updateStatus(@PathVariable(USER_ID) long userId,
                                               @PathVariable(EVENT_ID) long eventId,
                                               @Valid @RequestBody RequestStatusUpdate requestStatus) {

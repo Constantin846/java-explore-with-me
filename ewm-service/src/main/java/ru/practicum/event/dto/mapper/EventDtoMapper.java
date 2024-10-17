@@ -48,17 +48,20 @@ public interface EventDtoMapper {
     }
 
     @Named("toLocationLat")
-    default double toLocationLat(Location location) {
+    default Double toLocationLat(Location location) {
+        if (location == null) return null;
         return location.getLat();
     }
 
     @Named("toLocationLon")
-    default double toLocationLon(Location location) {
+    default Double toLocationLon(Location location) {
+        if (location == null) return null;
         return location.getLon();
     }
 
     @Named("toCategory")
     default Category toCategory(Long categoryId) {
+        if (categoryId == null) return null;
         Category category = new Category();
         category.setId(categoryId);
         return category;

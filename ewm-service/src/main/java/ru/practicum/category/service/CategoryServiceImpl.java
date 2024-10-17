@@ -31,10 +31,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto update(CategoryDto categoryDto, long catId) {
-        if (checkCategoryExists(catId)) {
-            return save(categoryDto);
-        }
-        return null;
+        Category oldCat = getCategoryById(catId);
+        categoryDto.setId(oldCat.getId());
+        return save(categoryDto);
     }
 
     @Override
@@ -47,7 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> findAll(PageParams params) {
-        return categoryRepository.findAllBy(PageRequest.of(params.getFrom(), params.getSize()));
+        List<Category> categories = categoryRepository.findAllBy(PageRequest.of(params.getFrom(), params.getSize()));
+        return mapper.toCategoryDto(categories);
     }
 
     @Override

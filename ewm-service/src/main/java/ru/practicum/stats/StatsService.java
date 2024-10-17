@@ -11,5 +11,7 @@ import java.util.concurrent.CompletableFuture;
 public interface StatsService {
     CompletableFuture<StatDto> create(HttpServletRequest request);
 
+    List<StatDtoResponse> findStatForEvent(HttpServletRequest request);
+
     List<StatDtoResponse> findStats(StatsRequestContext statsRequestContext);
 }

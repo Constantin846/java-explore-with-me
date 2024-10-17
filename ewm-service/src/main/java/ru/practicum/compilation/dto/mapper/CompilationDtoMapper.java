@@ -30,6 +30,7 @@ public interface CompilationDtoMapper {
 
     @Named("toEvents")
     default List<Event> toEvents(List<Long> eventIds) {
+        if (eventIds == null) return List.of();
         return eventIds.stream()
                 .map(id -> {
                     Event event = new Event();

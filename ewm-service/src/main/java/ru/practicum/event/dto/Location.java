@@ -12,12 +12,12 @@ import lombok.experimental.FieldDefaults;
 public class Location {
 
     @NotNull(message = "Location lat must be set")
-    @Max(value = 90)
-    @Min(value = -90)
+    @Max(message = "Max lat is 90", value = 90)
+    @Min(message = "Min lat is -90", value = -90)
     Double lat;
 
     @NotNull(message = "Location lon must be set")
-    @Max(value = 180)
-    @Min(value = -180)
+    @Max(message = "Max lon is 180", value = 180)
+    @Min(message = "Min lon is -180", value = -180)
     Double lon;
 }

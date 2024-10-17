@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -39,17 +40,19 @@ public class NewEventDto {
     @NotNull(message = "Event date must be set", groups = CreateValid.class)
     @JsonSerialize(using = InstantSerializer.class)
     @JsonDeserialize(using = InstantDeserializer.class)
-    @FutureOrPresent(message = "Event date must be in the future", groups = {CreateValid.class, UpdateValid.class})
+    @FutureOrPresent(message = "Event date must be in the future", groups = {CreateValid.class})
     Instant eventDate;
 
     @NotNull(message = "Event location must be set", groups = CreateValid.class)
     Location location;
 
-    Boolean paid;
+    Boolean paid = false;
 
-    Integer participantLimit;
+    @PositiveOrZero(message = "Participant limit of event must not be negative",
+            groups = {CreateValid.class, UpdateValid.class})
+    Integer participantLimit = 0;
 
-    Boolean requestModeration;
+    Boolean requestModeration = true;
 
     @NotBlank(message = "Event title must not be blank", groups = CreateValid.class)
     @NullOrNotBlank(message = "Event title must be null or not blank", groups = UpdateValid.class)

@@ -2,7 +2,9 @@ server.port: 8080
 
 stats-service.url: http://localhost:9090
 ewm-stats-dto.timestamp-pattern: yyyy-MM-dd HH:mm:ss
-ewm-service.app: ewm-main-service
+ewm-service:
+  app: ewm-main-service
+  date-start-app: 2024-10-01 00:00:00
 #ewm-service.executor-max-pool-size:
 
 spring:

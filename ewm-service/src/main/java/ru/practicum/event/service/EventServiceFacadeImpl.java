@@ -10,6 +10,7 @@ import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.dto.UpdateEventRequest;
+import ru.practicum.ewm.stats.dto.StatDtoResponse;
 import ru.practicum.stats.StatsService;
 
 import java.util.List;
@@ -58,7 +59,11 @@ public class EventServiceFacadeImpl implements EventServiceFacade {
 
     @Override
     public EventFullDto findByEventId(long eventId, HttpServletRequest request) {
+        List<StatDtoResponse> views = statsService.findStatForEvent(request);
         statsService.create(request);
-        return eventService.findByEventId(eventId);
+        EventFullDto event = eventService.findByEventId(eventId);
+        eventService.saveViews(eventId, views.size());
+        event.setViews((long) views.size());
+        return event;
     }
 }

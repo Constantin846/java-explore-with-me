@@ -1,16 +1,17 @@
 package ru.practicum.event.repository;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.event.model.Event;
 
 import java.time.Instant;
 import java.util.List;
 
+@UtilityClass
 public class EventSpecifications {
-    private EventSpecifications() {}
 
     public static Specification<Event> hasUserIdEquals(List<Long> userIds) {
-        return ((root, query, criteriaBuilder) -> root.get("user_id").in(userIds));
+        return ((root, query, criteriaBuilder) -> root.get("initiator").get("id").in(userIds));
     }
 
     public static Specification<Event> hasStateEquals(List<String> states) {
@@ -18,17 +19,17 @@ public class EventSpecifications {
     }
 
     public static Specification<Event> hasCategoryIdEquals(List<Long> categoryIds) {
-        return ((root, query, criteriaBuilder) -> root.get("category_id").in(categoryIds));
+        return ((root, query, criteriaBuilder) -> root.get("category").get("id").in(categoryIds));
     }
 
     public static Specification<Event> hasEventDateAfter(Instant rangeStart) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.greaterThanOrEqualTo(root.get("event_date"), rangeStart));
+                criteriaBuilder.greaterThanOrEqualTo(root.get("eventDate"), rangeStart));
     }
 
     public static Specification<Event> hasEventDateBefore(Instant rangeEnd) {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.lessThanOrEqualTo(root.get("event_date"), rangeEnd));
+                criteriaBuilder.lessThanOrEqualTo(root.get("eventDate"), rangeEnd));
     }
 
     public static Specification<Event> hasTextInAnnotation(String text) {
@@ -47,7 +48,7 @@ public class EventSpecifications {
 
     public static Specification<Event> hasAvailableIsTrue() {
         return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.greaterThan(root.get("participant_limit"), root.get("confirmed_requests")));
+                criteriaBuilder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")));
     }
 
    /* public static Specification<Event> hasSortByEventDate() {
@@ -56,6 +57,6 @@ public class EventSpecifications {
 
         }
 
-    }*/ //todo
+    }*/ //todo delete
 
 }

@@ -1,5 +1,6 @@
 package ru.practicum.category.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Null;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class CategoryDto {
     @Null(message = "Category id must not be set to create")
     Long id;
 
+    @NotBlank(message = "Category name must not be blank")
     @Length(message = "Event title length must be between 1 and 50 characters inclusive", min = 1, max = 50)
     String name;
 }

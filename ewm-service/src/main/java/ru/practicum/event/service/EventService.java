@@ -26,4 +26,6 @@ public interface EventService {
     List<EventShortDto> findAll(FindEventsParams params);
 
     EventFullDto findByEventId(long eventId);
+
+    void saveViews(long eventId, int views);
 }

@@ -5,10 +5,12 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
+@ToString
 @FieldDefaults(level = AccessLevel.PROTECTED)
 public class PageParams {
 

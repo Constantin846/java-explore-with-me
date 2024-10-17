@@ -2,18 +2,19 @@ package ru.practicum.exceptions;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.mappers.InstantStringMapper;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice(basePackages = "ru.practicum")
@@ -22,23 +23,18 @@ public class ErrorHandler {
     private final InstantStringMapper instantStringMapper;
     private static final String ERROR = "error";
     private static final String INTERNAL_SERVER_ERROR = "Internal server error";
+    private static final String THREW_EXCEPTION = "Threw exception: %s";
 
     @ExceptionHandler
-    public ResponseEntity<Object> handlerStatsServiceException(final StatsServiceException e) {
-        String[] message = e.getMessage()
-                .replace("{", "") //todo
-                .replace("}", "")
-                .split(":");
-
-        return ResponseEntity
-                .status(e.getStatus())
-                .body(Map.of(ERROR, Map.of(
-                        message[0], Map.of(
-                                message[1], Map.of(
-                                        message[2], message[3]
-                                )
-                        )
-                )));
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handlerStatsServiceException(final StatsServiceException e) {
+        log.warn(String.format(THREW_EXCEPTION, e));
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        apiError.setReason("Stat server error");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
     }
 
     @ExceptionHandler
@@ -47,6 +43,17 @@ public class ErrorHandler {
         ApiError apiError = new ApiError();
         apiError.setStatus(HttpStatus.NOT_FOUND.toString());
         apiError.setReason("The required object was not found");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handlerBadRequestException(final BadRequestException e) {
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST.toString());
+        apiError.setReason("The bad requested");
         apiError.setMessage(e.getMessage());
         apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
         return apiError;
@@ -64,14 +71,66 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handlerMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.FORBIDDEN.toString());
+        apiError.setReason("For the requested operation the request parameters are not met");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handlerRuntimeException(final RuntimeException e) {
-        return Map.of(ERROR, e.getMessage()); //todo
+    public ApiError handlerRuntimeException(final RuntimeException e) {
+        log.warn(String.format(THREW_EXCEPTION, e));
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        apiError.setReason("Runtime exception: something went wrong");
+        apiError.setMessage(INTERNAL_SERVER_ERROR);
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handlerDataIntegrityViolationException(final DataIntegrityViolationException e) {
+        log.warn(String.format(THREW_EXCEPTION, e));
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.CONFLICT.toString());
+        apiError.setReason("Constraint violation exception during save request to database");
+        apiError.setMessage("Conflict data exception");
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handlerConflictException(final ConflictException e) {
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.CONFLICT.toString());
+        apiError.setReason("Conflict case the conditions are not met");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handlerSQLException(final SQLException e) {
+        log.warn(String.format("Exception during request to database: %s", e));
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        apiError.setReason("Exception during request to database");
+        apiError.setMessage(e.getMessage());
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handlerValidException(final MethodArgumentNotValidException e) {
+    public ApiError handlerMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         List<StringBuilder> messages = fieldErrors.stream()
                 .map(fieldError -> {
@@ -94,9 +153,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handlerThrowable(final Throwable e) {
-        String message = INTERNAL_SERVER_ERROR; //todo
-        log.warn(message, e);
-        return Map.of(ERROR, message);
+    public ApiError handlerThrowable(final Throwable e) {
+        log.warn(INTERNAL_SERVER_ERROR, e);
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        apiError.setReason("Undefined server exception");
+        apiError.setMessage(INTERNAL_SERVER_ERROR);
+        apiError.setTimestamp(instantStringMapper.toString(Instant.now()));
+        return apiError;
     }
 }

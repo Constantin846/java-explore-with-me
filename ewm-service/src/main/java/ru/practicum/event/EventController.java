@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.PageParams;
 import ru.practicum.event.contexts.AdminFindEventsParams;
@@ -19,6 +21,7 @@ import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.dto.UpdateEventRequest;
+import ru.practicum.event.repository.EventRepository;
 import ru.practicum.event.service.EventServiceFacade;
 import ru.practicum.validation.groups.CreateValid;
 import ru.practicum.validation.groups.UpdateValid;
@@ -31,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class EventController {
+    private final EventRepository repository; // todo remove
     private final EventServiceFacade eventServiceFacade;
     private static final String ADMIN = "/admin";
     private static final String EVENTS = "/events";
@@ -42,12 +46,13 @@ public class EventController {
 
     @GetMapping(USERS + USER_ID_PATH + EVENTS)
     public List<EventShortDto> findAllByUserId(@PathVariable(USER_ID) long userId,
-                                            @Valid PageParams params) {
+                                               @Valid PageParams params) {
         log.info("Request: find all by user id={} with params={}", userId, params);
         return eventServiceFacade.findAllByUserId(userId, params);
     }
 
     @PostMapping(USERS + USER_ID_PATH + EVENTS)
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto create(@PathVariable(USER_ID) long userId,
                                 @Validated({CreateValid.class})  @RequestBody NewEventDto eventDto) {
         log.info("Request: create event: {}", eventDto);
@@ -65,7 +70,7 @@ public class EventController {
     public EventFullDto updateByEventIdUserId(
             @PathVariable(USER_ID) long userId,
             @PathVariable(EVENT_ID) long eventId,
-            @Validated({UpdateValid.class}) @RequestBody UpdateEventRequest eventDto) {
+            @Validated(UpdateValid.class) @RequestBody UpdateEventRequest eventDto) {
         log.info("Request: update event by event id={} with user id={}", eventId, userId);
         return eventServiceFacade.updateByEventIdUserId(eventId, userId, eventDto);
     }
@@ -76,10 +81,10 @@ public class EventController {
         return eventServiceFacade.findAllForAdmin(params);
     }
 
-    @PatchMapping(ADMIN+ EVENTS + EVENT_ID_PATH)
+    @PatchMapping(ADMIN + EVENTS + EVENT_ID_PATH)
     public EventFullDto updateByEventIdAdmin(
             @PathVariable(EVENT_ID) long eventId,
-            @RequestBody UpdateEventRequest eventDto) {
+            @Validated(UpdateValid.class) @RequestBody UpdateEventRequest eventDto) {
         log.info("Request: update event by admin with event id={}", eventId);
         return eventServiceFacade.updateByEventIdAdmin(eventId, eventDto);
     }

@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-public class TestStatsController {
+public class TestStatsController { //todo delete
     private final StatsClient statsClient;
 
     @PostMapping("/hit")

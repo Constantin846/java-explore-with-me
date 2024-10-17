@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.category.Category;
 import ru.practicum.user.User;
@@ -24,6 +25,7 @@ import java.time.Instant;
 @Table(name = "events")
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = "description")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Event {
 
@@ -35,11 +37,11 @@ public class Event {
     String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id")
     Category category; //todo
 
     @Column(name = "confirmed_requests")
-    Integer confirmedRequests;
+    int confirmedRequests;
 
     @Column(name = "created_on", nullable = false)
     Instant createdOn;
@@ -51,7 +53,7 @@ public class Event {
     Instant eventDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     User initiator; //todo
 
     @Column(name = "location_lat", nullable = false)
@@ -80,5 +82,5 @@ public class Event {
     String title;
 
     @Column(name = "views")
-    Long views;
+    long views;
 }
