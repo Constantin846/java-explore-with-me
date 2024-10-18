@@ -14,11 +14,12 @@ import ru.practicum.ewm.stats.dto.StatsRequestContext;
 
 import java.util.List;
 
+@Deprecated
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @Validated
-public class TestStatsController { //todo delete
+public class TestStatsController {
     private final StatsClient statsClient;
 
     @PostMapping("/hit")

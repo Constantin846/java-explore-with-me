@@ -10,12 +10,6 @@ import ru.practicum.event.model.Event;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
-    //List<Event> findAllByInitiator(User initiator, PageRequest page); // todo delete
-
-    //List<Event> findAll(Specification<Event> spec, PageRequest page);
-
-    //List<Event> findAllBy(Specification<Event> specification, PageRequest page);
-
     @Deprecated
     @Modifying(flushAutomatically = true)
     @Query(value = "update Event e set e.views = e.views + 1 where e.id in :ids")

@@ -105,12 +105,8 @@ public class EventServiceImpl implements EventService {
                         Event event = mapper.toEvent(eventDto);
                         if (Objects.nonNull(eventDto.getStateAction())) {
                             switch (eventDto.getStateAction()) {
-                                case SEND_TO_REVIEW -> {
-                                    oldEvent.setState(State.PENDING);
-                                }
-                                case CANCEL_REVIEW -> {
-                                    oldEvent.setState(State.CANCELED);
-                                }
+                                case SEND_TO_REVIEW -> oldEvent.setState(State.PENDING);
+                                case CANCEL_REVIEW -> oldEvent.setState(State.CANCELED);
                                 default -> {
                                     String message = String.format("Not accept action: %s", eventDto.getStateAction());
                                     log.warn(message);
@@ -250,7 +246,6 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto findByEventId(long eventId) {
-        System.out.println(Thread.currentThread().getName() + "FIND BY EVENT ID"); //todo
         Event event = getEventById(eventId);
         if (event.getState() != State.PUBLISHED) {
             String message = String.format("Not found published event: %s", eventId);
@@ -264,7 +259,6 @@ public class EventServiceImpl implements EventService {
     @Async
     @Transactional
     public void saveViews(long eventId, int views) {
-        System.out.println(Thread.currentThread().getName() + "SAVE VIEWS"); //todo
         eventRepository.saveViews(eventId, views);
     }
 
@@ -279,14 +273,6 @@ public class EventServiceImpl implements EventService {
     private Event getEventById(long eventId) {
         return eventRepository.findById(eventId).orElseThrow(() -> {
             String message = String.format("Event was not found by id: %s", eventId);
-            log.warn(message);
-            return new NotFoundException(message);
-        });
-    }
-
-    private User getUserById(long userId) { // todo delete
-        return userRepository.findById(userId).orElseThrow(() -> {
-            String message = String.format("User was not found by id: %s", userId);
             log.warn(message);
             return new NotFoundException(message);
         });

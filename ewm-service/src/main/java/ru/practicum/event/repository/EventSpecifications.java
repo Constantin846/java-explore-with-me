@@ -50,13 +50,4 @@ public class EventSpecifications {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")));
     }
-
-   /* public static Specification<Event> hasSortByEventDate() {
-        return ((root, query, criteriaBuilder) -> {
-             query.orderBy(criteriaBuilder.asc(root.get("event_date")));
-
-        }
-
-    }*/ //todo delete
-
 }

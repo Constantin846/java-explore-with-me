@@ -17,8 +17,6 @@ public interface CompilationDtoMapper {
 
     CompilationDto toCompilationDto(Compilation compilation);
 
-    Compilation toCompilation(CompilationDto compilationDto); //todo
-
     @Mapping(target = "events", qualifiedByName = "toEvents")
     Compilation toCompilation(CompilationDtoRequest newCompilationDto);
 

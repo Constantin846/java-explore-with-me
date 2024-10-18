@@ -38,7 +38,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    Category category; //todo
+    Category category;
 
     @Column(name = "confirmed_requests")
     int confirmedRequests;
@@ -54,7 +54,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    User initiator; //todo
+    User initiator;
 
     @Column(name = "location_lat", nullable = false)
     Double locationLat;

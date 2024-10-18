@@ -21,7 +21,6 @@ import ru.practicum.request.model.Status;
 import ru.practicum.user.repository.UserRepository;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +47,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional
-    public RequestDto create(long userId, long eventId) { //todo conflict exception
+    public RequestDto create(long userId, long eventId) {
         if (checkUserExists(userId)) {
             Event event = getEventById(eventId);
             if (event.getInitiator().getId() == userId) {
@@ -130,11 +129,6 @@ public class RequestServiceImpl implements RequestService {
                         log.warn(message);
                         throw new ConditionNotMetException(message);
                     }
-                    /*if (requests.stream().anyMatch(request -> request.getStatus() != Status.PENDING)) {
-                        String message = "Only request with status pending is able confirmed";
-                        log.warn(message);
-                        throw new ConditionNotMetException(message);
-                    }*/ //todo
 
                     if (event.getParticipantLimit() == UNLIMITED_PARTICIPANT) {
                         requests = requests.stream()
@@ -176,9 +170,9 @@ public class RequestServiceImpl implements RequestService {
 
         RequestStatusResponse response = new RequestStatusResponse();
         response.setConfirmedRequests(mapper.toRequestDto(
-                requestsMap.getOrDefault(Status.CONFIRMED, new HashSet<>())));
-        response.setConfirmedRequests(mapper.toRequestDto(
-                requestsMap.getOrDefault(Status.REJECTED, new HashSet<>())));
+                requestsMap.getOrDefault(Status.CONFIRMED, Set.of())));
+        response.setRejectedRequests(mapper.toRequestDto(
+                requestsMap.getOrDefault(Status.REJECTED, Set.of())));
         return response;
     }
 
@@ -201,13 +195,6 @@ public class RequestServiceImpl implements RequestService {
     private boolean checkUserExists(long userId) {
         if (userRepository.existsById(userId)) return true;
         String message = String.format("User was not found by id: %s", userId);
-        log.warn(message);
-        throw new NotFoundException(message);
-    }
-
-    private boolean checkEventExists(long eventId) { //todo delete
-        if (eventRepository.existsById(eventId)) return true;
-        String message = String.format("Event was not found by id: %s", eventId);
         log.warn(message);
         throw new NotFoundException(message);
     }

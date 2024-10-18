@@ -14,10 +14,12 @@ public class GeneratorConfiguration {
         return new StatsClientImpl(statsBaseUri);
     }
 
+    private static final int MAX_POOL_SIZE = 2;
+
     @Bean
     public Executor executor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(2); //todo
+        executor.setMaxPoolSize(MAX_POOL_SIZE);
         return executor;
     }
 }

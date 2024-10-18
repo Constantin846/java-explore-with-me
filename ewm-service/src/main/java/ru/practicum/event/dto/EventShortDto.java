@@ -25,7 +25,6 @@ public class EventShortDto {
     Integer confirmedRequests;
 
     @JsonSerialize(using = InstantSerializer.class)
-    //@JsonDeserialize(using = InstantDeserializer.class) //todo
     Instant eventDate;
 
     UserShortDto initiator;

@@ -21,7 +21,6 @@ import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.dto.UpdateEventRequest;
-import ru.practicum.event.repository.EventRepository;
 import ru.practicum.event.service.EventServiceFacade;
 import ru.practicum.validation.groups.CreateValid;
 import ru.practicum.validation.groups.UpdateValid;
@@ -34,7 +33,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class EventController {
-    private final EventRepository repository; // todo remove
     private final EventServiceFacade eventServiceFacade;
     private static final String ADMIN = "/admin";
     private static final String EVENTS = "/events";

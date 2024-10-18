@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void delete(long catId) {
         if (checkCategoryExists(catId)) {
-            categoryRepository.deleteById(catId); //todo
+            categoryRepository.deleteById(catId);
         }
     }
 
@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private CategoryDto save(CategoryDto categoryDto) {
-        Category category = mapper.toCategory(categoryDto); //todo
+        Category category = mapper.toCategory(categoryDto);
         category = categoryRepository.save(category);
         return mapper.toCategoryDto(getCategoryById(category.getId()));
     }

@@ -30,7 +30,6 @@ public class StatsServiceImpl implements StatsService {
     @Override
     @Async
     public CompletableFuture<StatDto> create(HttpServletRequest request) {
-        System.out.println(Thread.currentThread().getName()); //todo
         StatDto statDto = new StatDto();
         statDto.setApp(this.app);
         statDto.setUri(request.getRequestURI());
@@ -42,7 +41,6 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<StatDtoResponse> findStatForEvent(HttpServletRequest request) {
-        System.out.println(Thread.currentThread().getName() + "FIND STATS FOR EVENT"); //todo
         StatsRequestContext context = new StatsRequestContext();
         context.setStart(dateStartApp);
         context.setEnd(instantStringMapper.toString(Instant.now().plusSeconds(60)));
@@ -53,8 +51,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<StatDtoResponse> findStats(StatsRequestContext statsRequestContext) {
-        System.out.println(Thread.currentThread().getName()); //todo
-        log.info("Send request to find stats: {}", statsRequestContext); //todo
+        log.info("Send request to find stats: {}", statsRequestContext);
         return statsClient.findStats(statsRequestContext);
     }
 }
