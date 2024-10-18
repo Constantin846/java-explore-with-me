@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 import ru.practicum.event.repository.EventRepository;
-import ru.practicum.exceptions.ConditionNotMetException;
 import ru.practicum.exceptions.ConflictException;
 import ru.practicum.exceptions.NotAccessException;
 import ru.practicum.exceptions.NotFoundException;
@@ -71,13 +70,13 @@ public class RequestServiceImpl implements RequestService {
             request.setCreated(Instant.now());
             request.setEvent(event.getId());
             request.setRequester(userId);
-            request.setStatus(Status.PENDING);
+            if (event.getParticipantLimit() != UNLIMITED_PARTICIPANT && event.getRequestModeration()) {
+                request.setStatus(Status.PENDING);
+            } else {
+                request.setStatus(Status.CONFIRMED);
+                incrementConfirmedRequests(event);
+            }
             request = requestRepository.save(request);
-
-            int confirmedRequests = event.getConfirmedRequests();
-            event.setConfirmedRequests(++confirmedRequests);
-            eventRepository.save(event);
-
             return mapper.toRequestDto(getRequestById(request.getId()));
         }
         return null;
@@ -127,7 +126,7 @@ public class RequestServiceImpl implements RequestService {
                     if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
                         String message = String.format("Forbidden: events participation request limit reached: %s", event);
                         log.warn(message);
-                        throw new ConditionNotMetException(message);
+                        throw new ConflictException(message);
                     }
 
                     if (event.getParticipantLimit() == UNLIMITED_PARTICIPANT) {
@@ -151,11 +150,17 @@ public class RequestServiceImpl implements RequestService {
                         eventRepository.save(event);
                     }
                 } else if (requestStatus.getStatus() == Status.REJECTED) {
+                    if (requests.stream().anyMatch(request -> request.getStatus() == Status.CONFIRMED)) {
+                        String message = "Confirmed request must not reject";
+                        log.warn(message);
+                        throw new ConflictException(message);
+                    }
                     requests = requests.stream()
                             .map(request -> {
                                 request.setStatus(Status.REJECTED);
                                 return request;
                             }).toList();
+                    reduceConfirmedRequests(event, requests.size());
                 }
                 requestRepository.saveAll(requests);
                 return toRequestStatusResponse(requests);
@@ -204,5 +209,17 @@ public class RequestServiceImpl implements RequestService {
         String message = String.format("Not access to event: %s", event);
         log.warn(message);
         throw new NotAccessException(message);
+    }
+
+    private void incrementConfirmedRequests(Event event) {
+        int confirmedRequests = event.getConfirmedRequests();
+        event.setConfirmedRequests(++confirmedRequests);
+        eventRepository.save(event);
+    }
+
+    private void reduceConfirmedRequests(Event event, int count) {
+        int confirmedRequests = event.getConfirmedRequests() - count;
+        event.setConfirmedRequests(confirmedRequests);
+        eventRepository.save(event);
     }
 }
