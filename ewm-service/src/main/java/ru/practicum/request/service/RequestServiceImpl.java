@@ -93,6 +93,11 @@ public class RequestServiceImpl implements RequestService {
                 log.warn(message);
                 throw new NotAccessException(message);
             }
+            if (request.getStatus() == Status.CONFIRMED) {
+                String message = "Confirmed request must not cansel";
+                log.warn(message);
+                throw new ConflictException(message);
+            }
             request.setStatus(Status.CANCELED);
             request = requestRepository.save(request);
             return mapper.toRequestDto(getRequestById(request.getId()));
@@ -160,7 +165,6 @@ public class RequestServiceImpl implements RequestService {
                                 request.setStatus(Status.REJECTED);
                                 return request;
                             }).toList();
-                    reduceConfirmedRequests(event, requests.size());
                 }
                 requestRepository.saveAll(requests);
                 return toRequestStatusResponse(requests);
@@ -214,12 +218,6 @@ public class RequestServiceImpl implements RequestService {
     private void incrementConfirmedRequests(Event event) {
         int confirmedRequests = event.getConfirmedRequests();
         event.setConfirmedRequests(++confirmedRequests);
-        eventRepository.save(event);
-    }
-
-    private void reduceConfirmedRequests(Event event, int count) {
-        int confirmedRequests = event.getConfirmedRequests() - count;
-        event.setConfirmedRequests(confirmedRequests);
         eventRepository.save(event);
     }
 }
