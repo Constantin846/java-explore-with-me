@@ -33,6 +33,6 @@ public class StatDto {
     @NotNull(message = "Time must be set")
     @JsonSerialize(using = InstantSerializer.class)
     @JsonDeserialize(using = InstantDeserializer.class)
-    @PastOrPresent(message = "Timestamp must not be future")
+    @PastOrPresent(message = "Timestamp must not be in the future")
     Instant timestamp;
 }

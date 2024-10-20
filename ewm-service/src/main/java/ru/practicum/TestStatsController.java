@@ -14,6 +14,7 @@ import ru.practicum.ewm.stats.dto.StatsRequestContext;
 
 import java.util.List;
 
+@Deprecated
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class TestStatsController {
 
     @PostMapping("/hit")
     public StatDto create(@Valid @RequestBody StatDto statDto) {
-        log.info("Create stat: {}", statDto);
+        log.info("CreateValid stat: {}", statDto);
         return statsClient.create(statDto);
     }
 
