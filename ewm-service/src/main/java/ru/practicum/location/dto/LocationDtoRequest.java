@@ -10,6 +10,8 @@ public class LocationDtoRequest {
 
     Long id;
 
+    String name;
+
     Long locationType;
 
     Double lat;

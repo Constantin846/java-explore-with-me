@@ -65,10 +65,10 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_type_id", referencedColumnName = "id", nullable = false)
-    LocationType locationType; // todo select
+    LocationType locationType;
 
     @Column(name = "location_name", nullable = false)
-    String locationName; // todo select
+    String locationName;
 
     @Column(name = "paid", nullable = false)
     Boolean paid;

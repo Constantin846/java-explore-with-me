@@ -160,6 +160,12 @@ public class EventServiceImpl implements EventService {
             specifications.add(EventSpecifications.hasLocationInRadius(
                     params.getLat(), params.getLon(), params.getRadius()));
         }
+        if (Objects.nonNull(params.getLocationNames())) {
+            specifications.add(EventSpecifications.hasLocationNames(params.getLocationNames()));
+        }
+        if (Objects.nonNull(params.getLocationTypes())) {
+            specifications.add(EventSpecifications.hasLocationTypeEquals(params.getLocationTypes()));
+        }
         Specification<Event> allSpecifications = specifications.stream().reduce(Specification::and).get();
 
         List<Event> events = eventRepository.findAll(
@@ -246,6 +252,12 @@ public class EventServiceImpl implements EventService {
                 && Objects.nonNull(params.getLon())) {
             specifications.add(EventSpecifications.hasLocationInRadius(
                     params.getLat(), params.getLon(), params.getRadius()));
+        }
+        if (Objects.nonNull(params.getLocationNames())) {
+            specifications.add(EventSpecifications.hasLocationNames(params.getLocationNames()));
+        }
+        if (Objects.nonNull(params.getLocationTypes())) {
+            specifications.add(EventSpecifications.hasLocationTypeEquals(params.getLocationTypes()));
         }
         Specification<Event> allSpecifications = specifications.stream().reduce(Specification::and).get();
 

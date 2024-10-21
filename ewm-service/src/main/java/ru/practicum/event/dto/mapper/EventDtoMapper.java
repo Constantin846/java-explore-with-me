@@ -22,6 +22,7 @@ public interface EventDtoMapper {
 
     @Mapping(source = "location", target = "locationLat", qualifiedByName = "toLocationLat")
     @Mapping(source = "location", target = "locationLon", qualifiedByName = "toLocationLon")
+    @Mapping(source = "location", target = "locationName", qualifiedByName = "toLocationName")
     @Mapping(source = "location", target = "locationType", qualifiedByName = "toLocationType")
     @Mapping(target = "category", qualifiedByName = "toCategory")
     Event toEvent(NewEventDto newEventDto);
@@ -70,6 +71,12 @@ public interface EventDtoMapper {
         return location.getLon();
     }
 
+    @Named("toLocationName")
+    default String toLocationName(LocationDtoRequest location) {
+        if (location == null) return null;
+        return location.getName();
+    }
+
     @Named("toLocationType")
     default LocationType toLocationType(LocationDtoRequest location) {
         if (location == null) return null;
@@ -88,7 +95,7 @@ public interface EventDtoMapper {
     }
 
     @Named("toCategoryId")
-    default long toCategoryId(Category category){
+    default long toCategoryId(Category category) {
         return category.getId();
     }
 }

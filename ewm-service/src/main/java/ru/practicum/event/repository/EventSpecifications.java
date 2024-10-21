@@ -51,6 +51,14 @@ public class EventSpecifications {
                 criteriaBuilder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")));
     }
 
+    public static Specification<Event> hasLocationNames(List<String> locationNames) {
+        return ((root, query, criteriaBuilder) -> root.get("locationName").in(locationNames));
+    }
+
+    public static Specification<Event> hasLocationTypeEquals(List<Long> locationTypeIds) {
+        return ((root, query, criteriaBuilder) -> root.get("locationType").get("id").in(locationTypeIds));
+    }
+
     public static Specification<Event> hasLocationInRadius(Double lat, Double lon, Double radius) {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.lessThanOrEqualTo(
@@ -62,15 +70,4 @@ public class EventSpecifications {
                         radius)
                 );
     }
-
-    Double distance(Double lat, Double lon, Double locationLat, Double locationLon) {
-        double latDegreeToKM = 111.1;
-        double lonDegreeEquatorToKM = 111.32;
-        double deltaLat = (lat - locationLat) * latDegreeToKM;
-        deltaLat = deltaLat > 0 ? deltaLat : -deltaLat;
-
-
-
-        return lat + lon + locationLat + locationLon;
-    } // todo delete
 }
