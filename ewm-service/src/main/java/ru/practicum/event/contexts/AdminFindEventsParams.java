@@ -21,4 +21,12 @@ public class AdminFindEventsParams extends PageParams {
     protected String rangeStart;
 
     protected String rangeEnd;
+
+    protected List<Long> locationTypes; // todo specification
+
+    protected Double radius;
+
+    protected Double lat;
+
+    protected Double lon;
 }

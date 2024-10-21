@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.category.Category;
+import ru.practicum.location.LocationType;
 import ru.practicum.user.User;
 
 import java.time.Instant;
@@ -61,6 +62,13 @@ public class Event {
 
     @Column(name = "location_lon", nullable = false)
     Double locationLon;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_type_id", referencedColumnName = "id", nullable = false)
+    LocationType locationType; // todo select
+
+    @Column(name = "location_name", nullable = false)
+    String locationName; // todo select
 
     @Column(name = "paid", nullable = false)
     Boolean paid;

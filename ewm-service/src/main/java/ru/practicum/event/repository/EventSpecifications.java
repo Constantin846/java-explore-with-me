@@ -50,4 +50,27 @@ public class EventSpecifications {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")));
     }
+
+    public static Specification<Event> hasLocationInRadius(Double lat, Double lon, Double radius) {
+        return ((root, query, criteriaBuilder) ->
+                criteriaBuilder.lessThanOrEqualTo(
+                        criteriaBuilder.function("distance", Double.class,
+                                criteriaBuilder.literal(lat),
+                                criteriaBuilder.literal(lon),
+                                root.get("locationLat"),
+                                root.get("locationLon")),
+                        radius)
+                );
+    }
+
+    Double distance(Double lat, Double lon, Double locationLat, Double locationLon) {
+        double latDegreeToKM = 111.1;
+        double lonDegreeEquatorToKM = 111.32;
+        double deltaLat = (lat - locationLat) * latDegreeToKM;
+        deltaLat = deltaLat > 0 ? deltaLat : -deltaLat;
+
+
+
+        return lat + lon + locationLat + locationLon;
+    } // todo delete
 }

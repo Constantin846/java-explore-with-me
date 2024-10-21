@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.ewm.stats.dto.adapters.InstantDeserializer;
 import ru.practicum.ewm.stats.dto.adapters.InstantSerializer;
+import ru.practicum.location.dto.LocationDtoRequest;
 import ru.practicum.validation.constraints.NullOrNotBlank;
 import ru.practicum.validation.groups.CreateValid;
 import ru.practicum.validation.groups.UpdateValid;
@@ -44,7 +45,7 @@ public class NewEventDto {
     Instant eventDate;
 
     @NotNull(message = "Event location must be set", groups = CreateValid.class)
-    Location location;
+    LocationDtoRequest location;
 
     Boolean paid = false;
 
