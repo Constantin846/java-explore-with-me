@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.PageParams;
+import ru.practicum.category.Category;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.event.contexts.AdminFindEventsParams;
 import ru.practicum.event.contexts.FindEventsParams;
@@ -27,6 +28,8 @@ import ru.practicum.exceptions.ConditionNotMetException;
 import ru.practicum.exceptions.ConflictException;
 import ru.practicum.exceptions.NotAccessException;
 import ru.practicum.exceptions.NotFoundException;
+import ru.practicum.location.LocationType;
+import ru.practicum.location.LocationTypeRepository;
 import ru.practicum.mappers.InstantStringMapper;
 import ru.practicum.user.User;
 import ru.practicum.user.repository.UserRepository;
@@ -42,6 +45,7 @@ import java.util.Objects;
 public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
+    private final LocationTypeRepository locationTypeRepository;
     private final UserRepository userRepository;
     private final EventDtoMapper mapper;
     private final InstantStringMapper instantMapper;
@@ -57,21 +61,24 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto create(NewEventDto eventDto, long userId) {
-        if (checkUserExists(userId)) {
-            if (checkCategoryExists(eventDto.getCategory())) {
-                if (checkEventDateAvailable(eventDto.getEventDate(), TWO_HOURS)) {
+        if (checkEventDateAvailable(eventDto.getEventDate(), TWO_HOURS)) {
+            User user = getUserById(userId);
+            Category category = getCategoryById(eventDto.getCategory());
+            Event event = mapper.toEvent(eventDto);
 
-                    Event event = mapper.toEvent(eventDto);
-                    User user = new User();
-                    user.setId(userId);
-                    event.setInitiator(user);
-                    event.setState(State.PENDING);
-                    event.setCreatedOn(Instant.now());
-                    event = eventRepository.save(event);
-                    return mapper.toEventFullDto(getEventById(event.getId()));
-                }
+            if (eventDto.getLocation().getLocationType() != null) {
+                LocationType locationType = getLocationTypeByID(eventDto.getLocation().getLocationType());
+                event.setLocationType(locationType);
             }
+
+            event.setInitiator(user);
+            event.setCategory(category);
+            event.setState(State.PENDING);
+            event.setCreatedOn(Instant.now());
+            event = eventRepository.save(event);
+            return mapper.toEventFullDto(getEventById(event.getId()));
         }
+
         return null;
     }
 
@@ -147,6 +154,17 @@ public class EventServiceImpl implements EventService {
         if (Objects.nonNull(params.getRangeEnd())) {
             specifications.add(EventSpecifications.hasEventDateBefore(
                     instantMapper.toInstant(params.getRangeEnd())));
+        }
+        if (Objects.nonNull(params.getRadius()) && Objects.nonNull(params.getLat())
+                && Objects.nonNull(params.getLon())) {
+            specifications.add(EventSpecifications.hasLocationInRadius(
+                    params.getLat(), params.getLon(), params.getRadius()));
+        }
+        if (Objects.nonNull(params.getLocationNames())) {
+            specifications.add(EventSpecifications.hasLocationNames(params.getLocationNames()));
+        }
+        if (Objects.nonNull(params.getLocationTypes())) {
+            specifications.add(EventSpecifications.hasLocationTypeEquals(params.getLocationTypes()));
         }
         Specification<Event> allSpecifications = specifications.stream().reduce(Specification::and).get();
 
@@ -230,6 +248,17 @@ public class EventServiceImpl implements EventService {
         if (Objects.nonNull(params.getOnlyAvailable()) && params.getOnlyAvailable()) {
             specifications.add(EventSpecifications.hasAvailableIsTrue());
         }
+        if (Objects.nonNull(params.getRadius()) && Objects.nonNull(params.getLat())
+                && Objects.nonNull(params.getLon())) {
+            specifications.add(EventSpecifications.hasLocationInRadius(
+                    params.getLat(), params.getLon(), params.getRadius()));
+        }
+        if (Objects.nonNull(params.getLocationNames())) {
+            specifications.add(EventSpecifications.hasLocationNames(params.getLocationNames()));
+        }
+        if (Objects.nonNull(params.getLocationTypes())) {
+            specifications.add(EventSpecifications.hasLocationTypeEquals(params.getLocationTypes()));
+        }
         Specification<Event> allSpecifications = specifications.stream().reduce(Specification::and).get();
 
         Sort sort = getEventSort(params.getSort());
@@ -300,6 +329,30 @@ public class EventServiceImpl implements EventService {
         throw new NotFoundException(message);
     }
 
+    private User getUserById(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> {
+            String message = String.format("User was not found by id: %s", userId);
+            log.warn(message);
+            return new NotFoundException(message);
+        });
+    }
+
+    private Category getCategoryById(long catId) {
+        return categoryRepository.findById(catId).orElseThrow(() -> {
+            String message = String.format("Category was not found by id: %s", catId);
+            log.warn(message);
+            return new NotFoundException(message);
+        });
+    }
+
+    private LocationType getLocationTypeByID(long typeId) {
+        return locationTypeRepository.findById(typeId).orElseThrow(() -> {
+            String message = String.format("Location type was not found by id: %s", typeId);
+            log.warn(message);
+            return new NotFoundException(message);
+        });
+    }
+
     private Event updateProperties(Event oldEvent, Event event) {
         if (Objects.nonNull(event.getAnnotation())) {
             oldEvent.setAnnotation(event.getAnnotation());
@@ -321,6 +374,13 @@ public class EventServiceImpl implements EventService {
         }
         if (Objects.nonNull(event.getLocationLon())) {
             oldEvent.setLocationLon(event.getLocationLon());
+        }
+        if (Objects.nonNull(event.getLocationName())) {
+            oldEvent.setLocationName(event.getLocationName());
+        }
+        if (Objects.nonNull(event.getLocationType())) {
+            long id = event.getLocationType().getId();
+            oldEvent.setLocationType(getLocationTypeByID(id));
         }
         if (Objects.nonNull(event.getPaid())) {
             oldEvent.setPaid(event.getPaid());

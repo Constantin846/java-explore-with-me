@@ -50,4 +50,24 @@ public class EventSpecifications {
         return ((root, query, criteriaBuilder) ->
                 criteriaBuilder.greaterThan(root.get("participantLimit"), root.get("confirmedRequests")));
     }
+
+    public static Specification<Event> hasLocationNames(List<String> locationNames) {
+        return ((root, query, criteriaBuilder) -> root.get("locationName").in(locationNames));
+    }
+
+    public static Specification<Event> hasLocationTypeEquals(List<Long> locationTypeIds) {
+        return ((root, query, criteriaBuilder) -> root.get("locationType").get("id").in(locationTypeIds));
+    }
+
+    public static Specification<Event> hasLocationInRadius(Double lat, Double lon, Double radius) {
+        return ((root, query, criteriaBuilder) ->
+                criteriaBuilder.lessThanOrEqualTo(
+                        criteriaBuilder.function("distance", Double.class,
+                                criteriaBuilder.literal(lat),
+                                criteriaBuilder.literal(lon),
+                                root.get("locationLat"),
+                                root.get("locationLon")),
+                        radius)
+                );
+    }
 }

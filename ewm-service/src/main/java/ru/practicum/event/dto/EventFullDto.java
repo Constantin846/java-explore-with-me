@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.event.model.State;
 import ru.practicum.ewm.stats.dto.adapters.InstantSerializer;
+import ru.practicum.location.dto.LocationDto;
 
 import java.time.Instant;
 
@@ -20,7 +21,7 @@ public class EventFullDto extends EventShortDto {
 
     String description;
 
-    Location location;
+    LocationDto location;
 
     Integer participantLimit;
 

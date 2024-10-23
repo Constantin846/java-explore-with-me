@@ -1,8 +1,10 @@
 package ru.practicum.event.contexts;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.PageParams;
 
 import java.util.List;
@@ -10,15 +12,26 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@FieldDefaults(level = AccessLevel.PROTECTED)
 public class AdminFindEventsParams extends PageParams {
 
     private List<Long> users;
 
     private List<String> states;
 
-    protected List<Long> categories;
+    List<Long> categories;
 
-    protected String rangeStart;
+    String rangeStart;
 
-    protected String rangeEnd;
+    String rangeEnd;
+
+    List<Long> locationTypes;
+
+    List<String> locationNames;
+
+    Double radius;
+
+    Double lat;
+
+    Double lon;
 }
