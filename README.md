@@ -1,4 +1,17 @@
-# java-explore-with-me
-Template repository for ExploreWithMe project.
+# Java Explore With Me
+### Описание
+Данный проект создан в учебных целях (для изучения разработки backend приложений).
 
-[PR - part 3: feature](https://github.com/Constantin846/java-explore-with-me/pull/3)
+Функционал данного приложения - создание объявлений о событиях. Пользователи могут подписываться на интересующие их события.
+Событие в зависимости от своих свойств и подписки на него модерируются администратором. Также любой пользователь может 
+искать интересные события по определенным фильтрам, что записывается в сервис статистики.
+
+### Технологии
+* Java
+* Spring Boot
+* JPA
+* Hibernate
+* SQL (PostgreSQL)
+* Maven
+* Docker
+* Postman
